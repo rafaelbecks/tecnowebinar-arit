@@ -1,0 +1,158 @@
+<html>
+    <head>
+        <meta charset="utf-8" />
+        
+		<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+		<script src="cordova.js"></script>		
+        <link href="css/normalize.css" rel="stylesheet" type="text/css"/>
+        <link href="css/ionic.css" rel="stylesheet" type="text/css"/>
+        <link href="css/style.css" rel="stylesheet" type="text/css"/>
+		<script>   
+            var myARContent = null;
+            var itemsDict = {};
+            function didGetResults(results) {
+                if(results.length > 0) {
+                    var item = results[0].item;
+                    if (item.isAR) {
+                        if (itemsDict[item.uuid] === undefined) {
+                            myARItem = item;
+                            itemsDict[item.uuid] = myARItem;
+
+                            CraftARContent.createImageContentWithPath("ar_content.png", function(contentImage){
+                                myARContent = contentImage;
+                                 contentImage.wrapMode = CraftARContent.CRAFTAR_TRACKING_WRAP_ASPECT_FIT;
+                                contentImage.attachTo(item);
+                                CraftARTracking.addItem(item, function(){
+                                    CraftARTracking.startTracking();
+                                },function(err) {
+                                    alert("Error adding AR item: " + err.errorMessage);
+                                    CraftARSDK.startFinder();
+                                });
+                            });
+                        }
+                    } else {
+                        CraftARSDK.startFinder();
+                    }
+
+                }
+            }
+
+            function onError(error) {
+                // Search errors are reported here, we usually don't want to stop the finder mode
+            }
+
+            function didStartCapture() {
+               CraftARSDK.searchController = CraftARCloudRecognition.searchController;
+               CraftARCloudRecognition.onSearchResults(didGetResults);
+               CraftARCloudRecognition.onSearchError(onError);
+               CraftARCloudRecognition.setCollectionWithToken("50db49556ba9469b", function() {
+                    CraftARSDK.startFinder();
+               }, function(err) {
+                    alert("Error setting token: " + err.errorMessage);
+               });                 
+            }
+
+            function didGetTouchEvent(touch) {
+                var event = touch.event;
+                var content = touch.content;
+                switch (event) {
+                    case CraftARTouch.CRAFTAR_CONTENT_TOUCH_IN:
+                        console.log("Touch in: " + content.uuid);
+                        break;
+                    case CraftARTouch.CRAFTAR_CONTENT_TOUCH_OUT:
+                        console.log("Touch out: " + content.uuid);
+                        break;
+                    case CraftARTouch.CRAFTAR_CONTENT_TOUCH_UP:
+                        console.log("Touch up: " + content.uuid);
+                        break;
+                    case CraftARTouch.CRAFTAR_CONTENT_TOUCH_DOWN:
+                        console.log("Touch down: " + content.uuid);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            function didStartTrackingItem(item) {
+                console.log("Start tracking Item: " + item.uuid);
+            }
+
+
+            function didStopTrackingItem(item) {
+                console.log("Stop tracking item: " + item.uuid);
+            }
+
+
+            function didTrackingTimeout() {
+                alert("Tracking timeout");
+            }
+
+            function startCraftAR() 
+            {
+               CraftARTouch.onTouchEvent(didGetTouchEvent);
+
+               CraftARTracking.onStartTracking(didStartTrackingItem);  
+               CraftARTracking.onStopTracking(didStopTrackingItem);
+               CraftARTracking.onTrackingTimeOut(didTrackingTimeout);
+
+               CraftARSDK.onStartCapture(didStartCapture); 
+               CraftARSDK.startCapture();
+            }
+
+            function changeContent() {
+                var myARItem = Object.values(itemsDict)[0];
+                console.log("old: ");
+                console.log(myARContent);
+                myARContent.detachFrom(myARItem);
+                
+                CraftARContent.createImageContentWithPath("ar_content_2.jpg", function(newImageContent){
+                    console.log("new: ");
+                    console.log(newImageContent);
+                    newImageContent.wrapMode = CraftARContent.CRAFTAR_TRACKING_WRAP_ASPECT_FIT;
+                    newImageContent.attachTo(myARItem);
+                    myARContent = newImageContent;
+                });
+            }
+
+            document.addEventListener("deviceready", function() {
+                startCraftAR();
+            }, false);
+
+
+		</script>
+		
+    </head>
+    <body>
+       <h1 id="progress"></h1>
+        <div class="bar bar-header bar-light">
+            <h5 class="title" id="headerTitle">AR Programmatically Example</h5>
+        </div>
+
+        <div class="tabs tabs-icon-only" >
+            <a class="tab-item" id="shutterButton" style="visibility:visible;width:0px;">
+                <img class="icon ion-home" src="img/shutterButton.png"  id="mybutton" onclick="changeContent()" alt="" />
+            </a>
+            <div id="loadingGif" style="visibility:hidden;width:0px;">
+                <img src="img/spinner.gif" style="height:80%;"/>
+            </div>
+        </div>
+
+        <div id="popUpDiv" style="color:white" >
+            <div id="popUpMainDiv">
+                <img src="img/closeButton.png" id="closeButton" onclick=" $('#popUpDiv').fadeOut('slow', function () {
+                            popUpActive = false;
+                        });" alt="" style="max-width: 80%; max-height: 80%"/>
+                <div id="responseDiv">
+                    <div id="imageResponse">
+                        <img src="#" id="image_src" alt=""/>
+                    </div>
+                    <div id="textResponse">
+                        <h1 id="nameResponse"></h1>
+                        <h3 id="idResponse"></h3>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

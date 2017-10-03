@@ -1,0 +1,89 @@
+<html>
+    <head>
+        <meta charset="utf-8" />
+        
+		<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+		<script src="cordova.js"></script>		
+		<script>   
+                    
+
+                function startOfflineARTracking(collection) {
+                    for(var i in collection.listItems) {
+                        var item = collection.listItems[i];
+                        CraftARTracking.addItem(item);
+                    }
+                    CraftARTracking.startTrackingWithTimeout(15);
+                }
+
+                function didStartCapture() {
+
+                    CraftARCollectionManager.addCollectionWithBundleFile("augmentedreality.zip", function(collection) {
+                        startOfflineARTracking(collection);
+                    },function(err){
+                        alert("Error adding bundle: " + err.errorMessage);
+                    },function(progress){
+                        console.log("Progress: " + progress);
+                        $('#progress').html(progress);
+                    });
+                }
+
+
+
+                function didGetTouchEvent(touch) {
+                    var event = touch.event;
+                    var content = touch.content;
+                    switch (event) {
+                        case CraftARTouch.CRAFTAR_CONTENT_TOUCH_IN:
+                            console.log("Touch in: " + content.uuid);
+                            break;
+                        case CraftARTouch.CRAFTAR_CONTENT_TOUCH_OUT:
+                            console.log("Touch out: " + content.uuid);
+                            break;
+                        case CraftARTouch.CRAFTAR_CONTENT_TOUCH_UP:
+                            console.log("Touch up: " + content.uuid);
+                            break;
+                        case CraftARTouch.CRAFTAR_CONTENT_TOUCH_DOWN:
+                            console.log("Touch down: " + content.uuid);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                function didStartTrackingItem(item) {
+                    console.log("Start tracking Item: " + item.uuid);
+                }
+
+
+                function didStopTrackingItem(item) {
+                    console.log("Stop tracking item: " + item.uuid);
+                }
+
+
+                function didTrackingTimeout() {
+                    alert("Tracking timeout");
+                }
+
+                function startCraftAR() 
+                {
+                   CraftARTouch.onTouchEvent(didGetTouchEvent);
+
+                   CraftARTracking.onStartTracking(didStartTrackingItem);  
+                   CraftARTracking.onStopTracking(didStopTrackingItem);
+                   CraftARTracking.onTrackingTimeOut(didTrackingTimeout);
+
+                   CraftARSDK.onStartCapture(didStartCapture); 
+                   CraftARSDK.startCapture();
+                }
+
+                document.addEventListener("deviceready", function() {
+                    startCraftAR();
+                }, false);
+                
+		</script>
+		
+    </head>
+    <body>
+       <h1 id="progress"></h1>
+    </body>
+</html>

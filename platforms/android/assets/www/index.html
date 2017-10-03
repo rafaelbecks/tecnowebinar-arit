@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <title></title>
+
+
+    <link href="css/ionic.app.css" rel="stylesheet">
+
+    <script src="lib/ionic/js/ionic.bundle.js"></script>
+
+    <script src="cordova.js"></script>
+
+    <script src="js/app.js"></script>
+
+    <script src="cordova.js"></script>
+
+    <script>
+      function launchARProgrammatically() {
+              CraftARSDK.startView(null, null, {"loadUrl" : "ar_programmatically.html"});
+      };
+      function launchARFromCraftAR() {
+              CraftARSDK.startView(null, null, {"loadUrl" : "video.html"});
+      };
+      function launchImageRecognition() {
+              CraftARSDK.startView(null, null, {"loadUrl" : "image_recognition.html"});
+      };
+    </script>
+  </head>
+  <body ng-app="starter">
+
+    <ion-pane>
+      <ion-header-bar class="bar-balanced">
+        <h1 class="title">Ejemplos CraftARSDK</h1>
+      </ion-header-bar>
+      <ion-content>
+
+        <div class="card"  onclick="launchARProgrammatically();">
+          <div class="item item-text-wrap">
+              <h2>Imagen</h2>
+          </div>
+        </div>
+
+        <div class="card"  onclick="launchARFromCraftAR();">
+          <div class="item item-text-wrap">
+              <h2>Video Transparente</h2>
+          </div>
+        </div>
+
+        <div class="card"  onclick="launchImageRecognition();">
+          <div class="item item-text-wrap">
+              <h2>Modelo 3D</h2>
+          </div>
+        </div>
+
+        <center class="logo-it">
+          <img src="img/logo.svg">          
+        </center>
+
+      </ion-content>
+
+    <div class="bar bar-footer balanced">
+      <div class="title"><a href="http://impactotecnologico.net">Impacto Tecnológico</a></div>
+    </div>
+    </ion-pane>
+  </body>
+</html>

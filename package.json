@@ -1,0 +1,19 @@
+{
+    "name": "com.catchoom.craftarsdkexamples",
+    "version": "0.0.1",
+    "displayName": "Augmented Reality",
+    "cordova": {
+        "platforms": [
+            "android"
+        ],
+        "plugins": {
+            "cordova-plugin-whitelist": {},
+            "com.catchoom.craftar": {}
+        }
+    },
+    "dependencies": {
+        "cordova-android": "^6.2.3",
+        "cordova-plugin-whitelist": "1",
+        "com.catchoom.craftar": "craftar-cordova-plugin"
+    }
+}

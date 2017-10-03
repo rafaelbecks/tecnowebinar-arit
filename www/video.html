@@ -1,0 +1,104 @@
+<html>
+    <head>
+        <meta charset="utf-8" />
+        
+		<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+		<script src="cordova.js"></script>		
+		<script>   
+  
+                function onError(error) {
+                    // Ignore search errors in finder mode
+                }
+
+
+                function getResults(results) {
+                    if(results.length > 0) {
+                        var item = results[0].item;
+                        if (item.isAR) {
+                            CraftARTracking.addItem(item, function(){
+                                processingResults = false;
+                                CraftARTracking.startTracking();
+                            },function(err) {
+                                alert("Error adding AR item: " + err.errorMessage);
+                                processingResults = false;
+                                CraftARSDK.startFinder();
+                            });
+                        } else {
+                            //Finder finish on searchresults > 0
+                            CraftARSDK.startFinder();
+                        }
+                    }
+                }                   
+
+                function didStartCapture() {
+                    CraftARSDK.searchController = CraftARCloudRecognition.searchController;
+                    CraftARCloudRecognition.onSearchResults(getResults);
+                    CraftARCloudRecognition.onSearchError(onError);
+
+                    CraftARCloudRecognition.setCollectionWithToken("50db49556ba9469b", function() {
+                        CraftARSDK.startFinder();
+
+                    }, function(error) {
+                        alert("Error:" + error.errorMessage);
+                    });
+                }
+
+
+
+                function didGetTouchEvent(touch) {
+                    var event = touch.event;
+                    var content = touch.content;
+                    switch (event) {
+                        case CraftARTouch.CRAFTAR_CONTENT_TOUCH_IN:
+                            alert("Touch in: " + content.uuid);
+                            break;
+                        case CraftARTouch.CRAFTAR_CONTENT_TOUCH_OUT:
+                            alert("Touch out: " + content.uuid);
+                            break;
+                        case CraftARTouch.CRAFTAR_CONTENT_TOUCH_UP:
+                            alert("Touch up: " + content.uuid);
+                            break;
+                        case CraftARTouch.CRAFTAR_CONTENT_TOUCH_DOWN:
+                            alert("Touch down: " + content.uuid);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                function didStartTrackingItem(item) {
+                    // alert("Start tracking Item: " + item.uuid);
+                }
+
+
+                function didStopTrackingItem(item) {
+                    // alert("Stop tracking item: " + item.uuid);
+                }
+
+
+                function didTrackingTimeout() {
+                    // alert("Tracking timeout");
+                }
+
+                function startCraftAR() 
+                {
+                   CraftARTouch.onTouchEvent(didGetTouchEvent);
+
+                   CraftARTracking.onStartTracking(didStartTrackingItem);  
+                   CraftARTracking.onStopTracking(didStopTrackingItem);
+                   CraftARTracking.onTrackingTimeOut(didTrackingTimeout);
+
+                   CraftARSDK.onStartCapture(didStartCapture); 
+                   CraftARSDK.startCapture();
+                }
+
+                document.addEventListener("deviceready", function() {
+                    startCraftAR();
+                }, false);
+                
+		</script>
+		
+    </head>
+    <body>
+    </body>
+</html>
